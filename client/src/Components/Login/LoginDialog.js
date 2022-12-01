@@ -10,6 +10,10 @@ import React from "react";
 import { authenticateSignup ,authenticateLogin } from "../../service/api";
 import { useState } from "react";
 
+import { useCookies } from 'react-cookie';
+
+import axios from "axios";
+
 const Component = styled(Box)`
   display: flex;
   height: 75vh;
@@ -23,13 +27,13 @@ const Image = styled(Box)`
   width: 50%;
   padding: 25px 35px;
   color: white;
-`;
-const Wrapper = styled(Box)`
+  `;
+  const Wrapper = styled(Box)`
   display: flex;
   flex-direction: column;
   padding: 20px 40px;
-`;
-const LoginButton = styled(Button)`
+  `;
+  const LoginButton = styled(Button)`
   text-transform: none;
   background-color: #fb641b;
   border-radius: 2px;
@@ -38,8 +42,8 @@ const LoginButton = styled(Button)`
   &:hover {
     background-color: #fb641b;
   }
-`;
-const RequestOTP = styled(Button)`
+  `;
+  const RequestOTP = styled(Button)`
   text-transform: none;
   background-color: #fff;
   color: #2874f0;
@@ -63,11 +67,20 @@ const LoginDialog = (props) => {
       view : "signup",
       heading:"Look like you're new here!",
       subHeading:"Sign up with your  mobile Number to get Started"
-
+      
     }
   }
 
+  // cookies
+  const [cookies, setCookie] = useCookies(['user']);
+  
   const [account, setAccount] = useState(accountIntitalValues.login);
+
+
+  const [userLoginName, setUserLoginName] = useState({
+    login:false,
+    username:""
+  })
 // toggle signup
   const toggleSignUp =()=>{
     setAccount(accountIntitalValues.signUp)
@@ -96,22 +109,60 @@ const LoginDialog = (props) => {
 
   // login data from form
   const [login,setLogin] = useState({
-    username:"",
+    email:"",
     password:"",
   })
+
+  console.log(login)
   const onValueChange =(e)=>
   {
     setLogin({...login,[e.target.name]:e.target.value})
   }
 // on login button click
+
+const [message, setMessage] = useState('')
+
   const loginUser = async()=>{
     let loginRes= await authenticateLogin(login)
-    if(loginRes.status ==200){
+    // console.log(loginRes.data)
+    const token = loginRes.data.token;
+    const userdata = loginRes.data.userData
+
+    
+
+    console.log(userdata)
+
+    console.log(loginRes.data.userData)
+      // alert("Login successfully!!!" )   
+      setCookie('token', token, { path: '/' });
+      // setCookie('token', token, );
+    
+  
+    if(loginRes.status==200){
+      setUserLoginName({
+        login:true,
+        username:userdata.username,
+      }
+      )  
       handleClose()
         // alert(loginRes.data.data.firstname)
       }
 
+
   }
+
+
+  // condition for loginusername
+
+  // {
+  //   userLoginName ? userLoginName.login : "Login"
+  // }
+
+  // const loginUser = async ()=>{
+  //   let isLogin = await axios.post('http://localhost:5000',login)
+  //   console.log(isLogin)
+  //   alert("Login successfully!!!" )   
+  // }
   
   return (
     <>
@@ -161,7 +212,11 @@ const LoginDialog = (props) => {
                   Privacy Policy.
                 </Typography>
               </Typography>
-              <LoginButton   style={{ marginTop: "20px" }} onClick={()=> loginUser() } >Login</LoginButton>
+              <LoginButton   style={{ marginTop: "20px" }} onClick={()=> loginUser() } >
+                
+                Login
+                
+               </LoginButton>
               <Typography className="text-center mt-2">OR</Typography>
               <RequestOTP style={{ marginTop: "20px" }}>Request OTP</RequestOTP>
               <Button 

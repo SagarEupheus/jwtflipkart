@@ -59,7 +59,7 @@ const openDialog=()=>{
             }}>
               Become a Seller
             </Typography>
-            <Box style={{fontSize:"16px" ,letterSpacing: "0.1px",}} > 
+            <Box style={{fontSize:"16px",letterSpacing: "0.1px",}} > 
             <ShoppingCartIcon />
             <span className="cart" > Cart</span>
             </Box>

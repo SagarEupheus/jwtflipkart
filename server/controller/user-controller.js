@@ -50,6 +50,46 @@ export  const userLogin = async(req,res) =>{
 
     
 
+        const userExist = await User.findOne({email:email,password:password}) 
+        const userData = await User.findOne({email:email,password:password}).select({username: 1, email: 1 })
+        
+        if(!userExist){
+            return res.status(404).json({message:"user not found"})
+        }
+
+         if(userExist){
+
+            let token = jwt.sign({
+                UserId: userExist._id,
+                organisation: "sagarBika"
+            }, "key")
+
+           
+
+            res.status(200).send({status: true, message: "token created successfull", userData, token, })
+        }else{
+            return res.status(401).json(`invalid login`)
+         }
+    }
+    catch (err){
+        res.status(500).json("error",err.message)
+    }
+}
+
+
+
+export  const verifyToken = async(req,res) =>{
+
+    
+    try{
+        
+
+        let id = req.params
+
+        let d = jwt.verify
+
+    
+
          const userExist = await User.findOne({email:email,password:password}) 
 
         if(!userExist){
@@ -61,11 +101,12 @@ export  const userLogin = async(req,res) =>{
             let token = jwt.sign({
                 UserId: userExist._id,
                 organisation: "sagarBika"
-                
             }, "key")
 
+           
 
-            return res.status(200).send({status: true, message: "token created successfull", token})
+            res.status(200).send({status: true, message: "token created successfull", token})
+           
             
             
          }else{
@@ -76,3 +117,4 @@ export  const userLogin = async(req,res) =>{
         res.status(500).json("error",err.message)
     }
 }
+
